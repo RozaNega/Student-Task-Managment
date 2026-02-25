@@ -1,0 +1,88 @@
+﻿@model IEnumerable<ToDo>
+
+<div class="row">
+    <div class="col-md-2">
+        <form asp-action="Filter" method="post">
+
+            <div class="mb-3">
+                <label>Category</label>
+                <select name="filter" class="form-select"
+                        asp-items="@(new SelectList(ViewBag.Categories, "CategoryId", "Name", ViewBag.Filter.CategoryId))">
+                    <option value="all">All</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label>Due</label>
+                <select name="filter" class="form-select"
+                        asp-items="@(new SelectList(ViewBag.DueFilters, "Key", "Value", ViewBag.Filter.Due))">
+                    <option value="all">All</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label>Status</label>
+                <select name="filter" class="form-select"
+                        asp-items="@(new SelectList(ViewBag.Statuses, "StatusId", "Name", ViewBag.Filter.StatusId))">
+                    <option value="all">All</option>
+                </select>
+            </div>
+
+            <button class="btn btn-primary">Filter</button>
+            <a asp-action="Index" asp-route-id="" class="btn btn-secondary">Clear</a>
+        </form>
+    </div>
+
+    <div class="col-md-10">
+
+        <form asp-action="MarkComplete"
+              method="post"
+              asp-route-idFilter="@ViewBag.FilterString">
+
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Category</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var task in Model)
+                    {
+                        <tr>
+                            <td>@task.Description</td>
+                            <td>@task.Category?.Name</td>
+                            <td>@task.DueDate?.ToShortDateString()</td>
+                            <td>@task.Status?.Name</td>
+                            <td>
+                                @if (task.StatusId == "open")
+                                {
+                                    <button type="submit"
+                                            name="id"
+                                            value="@task.Id"
+                                            class="btn btn-sm btn-primary">
+                                        Mark Completed
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </form>
+
+        <form asp-action="DeleteComplete"
+              method="post"
+              asp-route-id="@ViewBag.FilterString">
+
+            <a asp-action="Add" class="btn btn-success">Add new task</a>
+            <button type="submit" class="btn btn-danger">
+                Delete completed
+            </button>
+        </form>
+    </div>
+</div>
